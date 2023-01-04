@@ -18,5 +18,7 @@ export const app = initializeApp(firebaseConfig);
 export const functions = getFunctions(app, "europe-west1");
 export const db = getFirestore(app);
 
-//connect emulators, add an if statement here later
-connectFunctionsEmulator(functions, "localhost", 5001);
+//connect emulators
+if (import.meta.env.DEV) {
+  connectFunctionsEmulator(functions, "localhost", 5001);
+}

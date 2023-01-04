@@ -32,12 +32,14 @@
   })
 </script>
 
-<button on:click={ async () => console.log( await updateDB() ) }>manual start</button>
-
 {#if online }
-  <LiveView/>
-  <Violations/>
-  {:else}
-  <Inactive/>
+<h1>Birdsnest</h1>
+<LiveView/>
+<Violations/>
+{:else}
+<Inactive/>
 {/if}
 
+{#if import.meta.env.DEV }
+  <button on:click={ async () => console.log( await updateDB() ) }>manual start</button>
+{/if}
