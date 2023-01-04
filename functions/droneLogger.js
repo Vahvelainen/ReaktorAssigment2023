@@ -7,6 +7,7 @@ const db = admin.firestore();
 
 exports.handleSchelude = handleSchelude;
 exports.getDrones = getDronesWithViolationInfo;
+exports.updateLastVisited = updateLastVisitedToNow;
 
 async function handleSchelude() {
   console.log('cycle start');
@@ -47,6 +48,19 @@ async function scheduleDroneUpdates() {
     await utils.sleep(2000);
   }
   console.log('cycle end');
+}
+
+async function updateLastVisitedToNow() {
+  const doc = db.collection('app-data').doc('schedule');
+  let ref = await doc.get()
+  let appData = ref.data()
+  const now = new Date() 
+  if (utils.differenseInMinutes( appData.last_visit, now ) > 1) {
+    doc.set({
+      last_visit: now,
+      scheduling: appData.scheduling,
+    })
+  }
 }
 
 async function updateDB() {

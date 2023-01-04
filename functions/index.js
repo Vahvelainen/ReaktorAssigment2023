@@ -6,11 +6,15 @@ const europeWestHttps = europeWest.https;
 
 exports.updateDB = europeWestHttps.onCall(async () => {
   logger.handleSchelude();
-  return 'asdf'//await updateDB();
+  return 'Cycle started'
 });
 
 exports.getDrones = europeWestHttps.onCall(async (data, context) => {
   return await logger.getDrones();
+});
+
+exports.updateLastVisited = europeWestHttps.onCall(async (data, context) => {
+  return await logger.updateLastVisited();
 });
 
 //pubsub emulator removed for being complicated and useless. See https://cloud.google.com/pubsub/docs/emulator

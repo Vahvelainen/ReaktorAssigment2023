@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 // Initialize Firebase services
 export const app = initializeApp(firebaseConfig);
 export const functions = getFunctions(app, "europe-west1");
+export const db = getFirestore(app);
 
 //connect emulators, add an if statement here later
 connectFunctionsEmulator(functions, "localhost", 5001);

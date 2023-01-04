@@ -1,53 +1,46 @@
-
 <script>
-  import {getDrones, updateDB} from '@lib/cloudFunctions'
+  import {updateDB, updateLastVisited} from '@lib/cloudFunctions'
+  import { collection, doc, onSnapshot, query, orderBy, } from "firebase/firestore";
+  import {db} from '@lib/firebase'
+  import { onMount, onDestroy } from 'svelte';
 
   let drones = []
-  
-  loadDrones()
+  let violations = []
 
-  async function loadDrones() {
-    drones = await getDrones();
-    console.log( drones[0] ); 
-  }
+  const d = doc(db, "app-data", "sky_picture")
+  const unsubDrones = onSnapshot(d, (doc) => {
+    const data = doc.data();
+    let droneSnap = []
+    for (let i = 0; i < data.count; i++) {
+      droneSnap.push({
+        x: data.x[i],
+        y: data.y[i],
+        onNDZ: data.onNDZ[i],
+      })
+      drones = droneSnap
+    }
+  })
 
-  function xmlToJson(xml) {
-	
-	// Create the return object
-	var obj = {};
+  const violationsRef = collection(db, "violations")
+  const q = query(violationsRef, orderBy('last_violated'))
+  const unsubViolations = onSnapshot(q, (querySnapshot) => {
+    const violationsSnap = []
+    querySnapshot.forEach((doc) => {
+      violationsSnap.push(doc.data())
+    });
+    violations = violationsSnap
+  });
 
-	if (xml.nodeType == 1) { // element
-		// do attributes
-		if (xml.attributes.length > 0) {
-		obj["@attributes"] = {};
-			for (var j = 0; j < xml.attributes.length; j++) {
-				var attribute = xml.attributes.item(j);
-				obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-			}
-		}
-	} else if (xml.nodeType == 3) { // text
-		obj = xml.nodeValue;
-	}
+  updateLastVisited()
+  const helloInterval = setInterval(function() {
+    updateLastVisited()
+  }, 60000);
 
-	// do children
-	if (xml.hasChildNodes()) {
-		for(var i = 0; i < xml.childNodes.length; i++) {
-			var item = xml.childNodes.item(i);
-			var nodeName = item.nodeName;
-			if (typeof(obj[nodeName]) == "undefined") {
-				obj[nodeName] = xmlToJson(item);
-			} else {
-				if (typeof(obj[nodeName].push) == "undefined") {
-					var old = obj[nodeName];
-					obj[nodeName] = [];
-					obj[nodeName].push(old);
-				}
-				obj[nodeName].push(xmlToJson(item));
-			}
-		}
-	}
-	return obj;
-};
+  onDestroy( () => {
+    unsubViolations()
+    unsubDrones()
+    clearInterval(helloInterval)
+  })
 
 </script>
 
@@ -57,28 +50,19 @@
       <div 
         class="dot"
         style="
-          left:{ drone.positionX / 5000 }%;
-          top:{ drone.positionY / 5000 }%;
+          left:{ drone.x / 5000 }%;
+          top:{ drone.y / 5000 }%;
           background-color:{ drone.onNDZ ? 'red' : 'blue' }"
       ></div>
     {/each}
   </div>
 
-  <button on:click={ loadDrones }>update</button>
-  <button on:click={ async () => console.log( await updateDB() ) }>updateDB</button>
+  <button on:click={ async () => console.log( await updateDB() ) }>manual start</button>
 
-
-
-  {#each drones as drone}
+  {#each violations as violation}
     <div>
-      <h4>{drone.manufacturer} {drone.model}</h4>
-      <p>{drone.positionX},  {drone.positionY}</p>
-      {#if drone.onNDZ }
-        <p class="☹"><strong>Violating NDZ</strong></p>
-      {:else}
-        <p class="😊"><strong>Not violating NDZ</strong></p>
-      {/if}
-      <p>{drone.distanceToNest}</p>
+      <p><strong>{violation.firstName} {violation.lastName}, {violation.phoneNumber}</strong></p>
+      <p>Closest to the nest: { Math.round(violation.distanceToNest / 10) / 100 } meters</p>
     </div>
   {/each}
 
@@ -89,12 +73,13 @@
       width: 500px;
       height: 500px;
       border: 2px solid black;
+      background-color: lightblue;
       border-radius: 5px;
     }
 
     .ndz {
       position: absolute;
-      background-color: lightblue;
+      border: 1px solid red;
       height: 200px;
       width: 200px;
       left: 50%;
@@ -109,25 +94,18 @@
     .dot {
       position: absolute;
       background-color: black;
-      height: 5px;
-      width: 5px;
+      border: 1px solid black;
+      height: 10px;
+      width: 10px;
       transform: 
-        translateX(-2,5px)
-        translateY(-2,5px)
+        translateX(-5px)
+        translateY(-5px)
       ;
       border-radius: 99px;
     }
 
     div {
       width: 500px;
-    }
-
-    .☹ {
-      color: red;
-    }
-
-    .😊 {
-      color: green;
     }
 
   </style>
