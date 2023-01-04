@@ -4,7 +4,7 @@
 </svelte:head>
 
 <script>
-	import DroneWatcher from "@lib/DroneWatcher.svelte";
+	import DroneWatcher from "@droneWatcher";
 </script>
 
 <section>

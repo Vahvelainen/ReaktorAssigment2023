@@ -98,6 +98,7 @@ async function logViolation(drone, violations) {
   const collection = db.collection('violations')
   const violationSerialNumbers = violations.length ? violations.map( violation => violation.serialNumber) : [];
   const index = violationSerialNumbers.indexOf(drone.serialNumber);
+  const now = admin.firestore.Timestamp.now();
   let violation
 
   console.log(drone.serialNumber, index);
@@ -108,7 +109,7 @@ async function logViolation(drone, violations) {
     violation = violations[index];
     const newViolation = {
       ...violation,
-      last_violated: admin.firestore.Timestamp.now(),
+      last_violated: now,
     };
     newViolation.distanceToNest = Math.min(drone.distanceToNest, violation.distanceToNest);
     violation = newViolation
@@ -121,7 +122,8 @@ async function logViolation(drone, violations) {
     violation = {
       ...drone,
       ...violator,
-      last_violated: admin.firestore.Timestamp.now(),
+      first_violated: now,
+      last_violated: now,
     }
     
   }

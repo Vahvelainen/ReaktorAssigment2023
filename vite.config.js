@@ -8,6 +8,7 @@ const config = {
 	resolve: {
 		alias: {
 			'@lib': path.resolve('./src/lib'),
+			'@droneWatcher': path.resolve('./src/droneWatcher/DroneWatcher.svelte'),
 		}
 	},
 };
