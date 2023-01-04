@@ -3,6 +3,10 @@
 	<meta name="description" content="Reaktor 2023 app by Leevi Vahvelainen" />
 </svelte:head>
 
+<script>
+	import DroneWatcher from "@lib/DroneWatcher.svelte";
+</script>
+
 <section>
 	<h1>
 		Hello world
@@ -12,6 +16,7 @@
 		try editing <strong>src/routes/+page.svelte</strong>
 	</h2>
 
+	<DroneWatcher/>
 </section>
 
 <style>

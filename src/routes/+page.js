@@ -1,3 +1,3 @@
-// since there's no dynamic data here, we can prerender
-// it so that it gets served as a static asset in production
-export const prerender = true;
+
+// could function emulators dont play well with SSR, could conf this with envs but eh. 
+export const ssr = false;
