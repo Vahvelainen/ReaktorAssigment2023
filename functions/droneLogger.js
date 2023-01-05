@@ -7,6 +7,7 @@ const db = admin.firestore();
 
 exports.handleSchelude = handleSchelude;
 exports.getDrones = getDronesWithViolationInfo;
+exports.updateDB = updateDB;
 exports.updateLastVisited = updateLastVisitedToNow;
 
 async function handleSchelude() {
@@ -44,9 +45,12 @@ async function scheduleDroneUpdates() {
   //https://groups.google.com/g/firebase-talk/c/utm8IlV4GWU?pli=1
   let promises = [];
   for (let i = 0; i < 30; i++) {
-    promises.push(updateDB());
-    await utils.sleep(2000);
+    promises.push(callCloudUpDateDB());
+    if ( i < 29 ) {
+      await utils.sleep(2000);
+    }
   }
+  //await Promise.all(promises);
   console.log('cycle end');
 }
 
@@ -63,33 +67,56 @@ async function updateLastVisitedToNow() {
   }
 }
 
+async function callCloudUpDateDB() {
+  //Calls updateDB as another function to have enough processing power
+  let functionURL;
+  if (process.env.FUNCTIONS_EMULATOR) {
+    //Use emulator
+    functionURL = 'http://localhost:5001/reaktorbirdnest/europe-west1/cloudUpdateDB'
+  } else {
+    //Use production
+    functionURL = 'https://europe-west1-reaktorbirdnest.cloudfunctions.net/cloudUpdateDB'
+  }
+  const res = axios.get(functionURL)
+  return res.data
+}
+
 async function updateDB() {
-  const collection = db.collection('violations');
-
-  let violations = await getViolationsFromDB();
-
   const drones = await getDronesWithViolationInfo();
   setSkypicture(drones);
-
+  
+  const collection = db.collection('violations');
+  let violations = await getViolationsFromDB();
+  violations = deleteOldViolations(violations);
+  
   const violatingDrones = drones.filter( drone => drone.onNDZ);
   
   for (let i = 0; i < violatingDrones.length; i++) {
     const drone = violatingDrones[i];
-    const violation = await logViolation(drone, violations);
-    violations.push(violation)
+    logViolation(drone, violations);
   }
-
-  violations = deleteOldViolations(violations);
-
-  return violations
+  
+  return
 }
 
-function setSkypicture(drones) {
+async function setSkypicture(drones) {
+  let x = [];
+  let y = [];
+  let onNDZ = [];
+
+  //for intead of maps for performance (idk why, the whole feature is a nice to have extra)
+  for (let i = 0; i < drones.length; i++) {
+    const drone = drones[i];
+    x.push(drone.positionX);
+    y.push(drone.positionY);
+    onNDZ.push(drone.onNDZ);
+  }
+
   db.collection('app-data').doc('sky_picture').set({
     count: drones.length,
-    x: drones.map(drone => drone.positionX),
-    y: drones.map(drone => drone.positionY),
-    onNDZ: drones.map(drone => drone.onNDZ),
+    x: x,
+    y: y,
+    onNDZ: onNDZ,
     last_update: admin.firestore.Timestamp.now(),
   })
 }
@@ -116,19 +143,23 @@ async function logViolation(drone, violations) {
 
   } else {
 
-    //create new one
+    //create new one (save only necessary info for performance reasons)
     const resp = await axios.get("https://assignments.reaktor.com/birdnest/pilots/" + drone.serialNumber );
-    const violator = resp.data;
+    //add skip if 404
+    const pilot = resp.data;
     violation = {
-      ...drone,
-      ...violator,
+      firstName: pilot.firstName,
+      lastName: pilot.lastName,
+      phoneNumber: pilot.phoneNumber,
+      distanceToNest: drone.distanceToNest,
+      serialNumber: drone.serialNumber,
       first_violated: now,
       last_violated: now,
     }
     
   }
   
-  const res = await collection.doc(drone.serialNumber).set(violation);
+  collection.doc(drone.serialNumber).set(violation);
   return violation;
 }
 
@@ -166,7 +197,8 @@ async function getViolationsFromDB() {
 async function getDronesWithViolationInfo() {
   let drones = await getDrones();
   let dronesWithViolationInfo = [];
-  drones.forEach(drone => {
+  for (let i = 0; i < drones.length; i++) { //for loop for performance reasons
+    const drone = drones[i];
     const distanceToNest = utils.euclideanDistance2D(drone.positionX, drone.positionY, 250000, 250000);
     const onNDZ = distanceToNest < 100000;
     dronesWithViolationInfo.push({
@@ -174,7 +206,7 @@ async function getDronesWithViolationInfo() {
        onNDZ: onNDZ,
        distanceToNest: distanceToNest,
     });
-  });
+  }
   return dronesWithViolationInfo
 }
 

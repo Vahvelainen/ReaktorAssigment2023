@@ -4,14 +4,25 @@ const logger = require("./droneLogger")
 const europeWest = functions.region("europe-west1")
 const europeWestHttps = europeWest.https;
 
-exports.updateDB = europeWestHttps.onCall(async () => {
-  logger.handleSchelude();
-  return 'Cycle started'
+//functions only available with emulator for dev
+if (process.env.FUNCTIONS_EMULATOR) {
+
+  exports.updateDB = europeWestHttps.onCall(async () => {
+    logger.handleSchelude();
+    return 'Cycle started'
+  });
+
+  exports.getDrones = europeWestHttps.onCall(async (data, context) => {
+    return await logger.getDrones();
+  });
+
+}
+
+exports.cloudUpdateDB = europeWestHttps.onRequest((req, res) => {
+  logger.updateDB();
+  res.json({result: `Message with ID: added.`});
 });
 
-exports.getDrones = europeWestHttps.onCall(async (data, context) => {
-  return await logger.getDrones();
-});
 
 exports.updateLastVisited = europeWestHttps.onCall(async (data, context) => {
   return await logger.updateLastVisited();
@@ -19,7 +30,7 @@ exports.updateLastVisited = europeWestHttps.onCall(async (data, context) => {
 
 //pubsub emulator removed for being complicated and useless. See https://cloud.google.com/pubsub/docs/emulator
 //firebase deploy --only functions scheduledFunction
-exports.scheduledFunction = europeWest.pubsub.schedule('every 1 minutes').onRun((context) => {
-  logger.handleSchelude();
+exports.scheduledFunction = europeWest.pubsub.schedule('every 1 minutes').onRun(async (context) => {
+  await logger.handleSchelude();
   return null;
 });
