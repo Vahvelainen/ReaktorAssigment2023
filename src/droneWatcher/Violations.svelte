@@ -2,6 +2,7 @@
   import { collection, onSnapshot, query, orderBy, } from "firebase/firestore";
   import {db} from '@lib/firebase'
   import { onMount, onDestroy } from 'svelte';
+  import DataTable, { Head, Body, Row, Cell } from '@smui/data-table';
 
   let violations = []
   let unsubViolations = () => {}
@@ -28,26 +29,25 @@
 <section class="violations">
   <h2>Violations</h2>
 
-  <table>
-    <tr class="header">
-      <th>Name</th>
-      <th>Phone Number</th>
-      <th>Closest distance</th>
-    </tr>
-  
-    {#each violations as violation}
-      <tr>
-        <td><strong>{violation.firstName} {violation.lastName}</strong></td>
-        <td><strong>{violation.phoneNumber}</strong></td>
-        <td>{ Math.round(violation.distanceToNest / 10) / 100 } meters</td>
-      </tr>
-    {/each}
-  </table>
-</section>
+  <DataTable table$aria-label="Violation list" style="max-width: 100%;">
+    <Head>
+      <Row>
+        <Cell>Name</Cell>
+        <Cell>Email</Cell>
+        <Cell>Phone Number</Cell>
+        <Cell numeric>Closest distance</Cell>
+      </Row>
+    </Head>
+    <Body>
+      {#each violations as violation (violation.serialNumber)}
+        <Row>
+          <Cell>{violation.firstName} {violation.lastName}</Cell>
+          <Cell>{violation.email}</Cell>
+          <Cell>{violation.phoneNumber}</Cell>
+          <Cell numeric>{ Math.round(violation.distanceToNest / 10) / 100 } meters</Cell>
+        </Row>
+      {/each}
+    </Body>
+  </DataTable>
 
-<style>
-  table {
-    width: 500px;
-    text-align: left;
-  }
-</style>
+</section>

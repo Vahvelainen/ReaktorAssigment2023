@@ -16,6 +16,7 @@
           x: data.x[i],
           y: data.y[i],
           onNDZ: data.onNDZ[i],
+          serialNumber: data.serialNumber[i],
         })
         drones = droneSnap
       }
@@ -24,14 +25,13 @@
 
   onDestroy( () => {
     unsubDrones()
-    clearInterval(helloInterval)
   })
 
 </script>
 
   <div class="live">
     <div class="ndz"></div>
-    {#each drones as drone}
+    {#each drones as drone (drone.serialNumber) }
       <div 
         class="dot"
         style="
@@ -47,7 +47,7 @@
       position: relative;
       width: 500px;
       height: 500px;
-      border: 2px solid black;
+      border: 2px solid lightgray;
       background-color: lightblue;
       border-radius: 5px;
     }
@@ -77,6 +77,7 @@
         translateY(-5px)
       ;
       border-radius: 99px;
+      transition: 0.5s ease-in-out;
     }
 
   </style>
