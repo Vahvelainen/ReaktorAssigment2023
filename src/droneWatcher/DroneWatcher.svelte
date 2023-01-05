@@ -17,11 +17,11 @@
   })
   
   let online = false;
-  let unsunOnline = () => {}
+  let unsubOnline = () => {}
 
   onMount( () => {
     const d = doc(db, "app-data", "schedule")
-    unsunOnline = onSnapshot(d, (doc) => {
+    unsubOnline = onSnapshot(d, (doc) => {
       const data = doc.data();
       online = data.scheduling;
     })
@@ -33,13 +33,14 @@
 </script>
 
 {#if online }
-<h1>Birdsnest</h1>
-<LiveView/>
-<Violations/>
+  <h1>Birdsnest</h1>
+  <LiveView/>
+  <Violations/>
 {:else}
-<Inactive/>
+  <Inactive/>
 {/if}
 
 {#if import.meta.env.DEV }
+  <!-- Manual scheduler start for developement -->
   <button on:click={ async () => console.log( await updateDB() ) }>manual start</button>
 {/if}

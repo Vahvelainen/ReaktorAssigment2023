@@ -6,9 +6,10 @@
   let violations = []
   let unsubViolations = () => {}
 
+  //subscribe to violations collection
   onMount( () => {
     const violationsRef = collection(db, "violations")
-    const q = query(violationsRef, orderBy('first_violated'))
+    const q = query(violationsRef, orderBy('first_violated', 'desc'))
     unsubViolations = onSnapshot(q, (querySnapshot) => {
       const violationsSnap = []
       querySnapshot.forEach((doc) => {
