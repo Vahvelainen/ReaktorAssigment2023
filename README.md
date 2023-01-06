@@ -1,4 +1,4 @@
-# Reaktor Birsnest
+# Reaktor Birtsnest
 Answer to the Reaktor 2023 Developer Trainee pre-assigment https://assignments.reaktor.com/birdnest/?_gl=1*1a7lrer*_ga*MzM5NzY2NzI4LjE2NzI2NzM1NzA.*_ga_DX023XT0SX*MTY3MzAxMjQxMS44LjAuMTY3MzAxMjQxMS42MC4wLjA.
 
 ## Stack and about the solution
