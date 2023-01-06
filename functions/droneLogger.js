@@ -25,7 +25,7 @@ async function updateDB() {
   return
 }
 
-async function setSkypicture(drones) {
+function setSkypicture(drones) {
   let x = [];
   let y = [];
   let onNDZ = [];
@@ -73,7 +73,7 @@ async function logViolation(drone, violations) {
 
     // Create new doc
     const resp = await axios.get("https://assignments.reaktor.com/birdnest/pilots/" + drone.serialNumber );
-    //add skip if 404
+    if (resp.status != 200) return null
     // (only necessary info for performance reasons)
     const pilot = resp.data;
     violation = {
