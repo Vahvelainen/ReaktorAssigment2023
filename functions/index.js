@@ -8,7 +8,7 @@ const europeWestHttps = europeWest.https;
 
 exports.cloudUpdateDB = europeWestHttps.onRequest((req, res) => {
   logger.updateDB();
-  res.json({result: `Message with ID: added.`});
+  res.json({message: `DB updated`});
 });
 
 exports.updateLastVisited = europeWestHttps.onCall(async (data, context) => {
