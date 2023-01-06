@@ -1,38 +1,22 @@
-# create-svelte
+Reaktor Birsnest
+Answer to the Reaktor 2023 Developer Trainee pre-assigment https://assignments.reaktor.com/birdnest/?_gl=1*1a7lrer*_ga*MzM5NzY2NzI4LjE2NzI2NzM1NzA.*_ga_DX023XT0SX*MTY3MzAxMjQxMS44LjAuMTY3MzAxMjQxMS42MC4wLjA.
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Stack and about the solution
+The solution utilises Sveltekit + Google firebase. The most important parts of the solution are located in:
 
-## Creating a project
+functions/
 
-If you're seeing this, you've probably already done this step. Congrats!
+Source folder for the google cloud functions, operating as the back end logic Most of the solution related logic is in droneLogger.js scheduler.js answers the question how to get a task like this running on cloud funtionns
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+src/droneWatcher
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+Frontend of the solution in svelte DroneWatcher.svelte for the whole component, Violations.svelte for a table of the reguired adata for the assigment and LiveView for (arguably) cool areal snapshot of the area
 
-## Developing
+Kinks and quirks
+The scheduler turns of after 30 minutes without and update from client.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Bc of the way scheduler is only run every minute, it takes up to a minute to start working again.
 
-```bash
-npm run dev
+The cloudfunctions have somethign called "ramp-up-time" before they are given the full performance (I suppose dedicated threat or something) for which is why the program might studder or lag for the first ten minutes of being active or so.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Also the assigment URL returns 429 every now or then (I would assume its bc someone else is doing the assigment aswell) an update might be skipped.
