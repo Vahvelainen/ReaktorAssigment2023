@@ -6,17 +6,17 @@ The solution utilises Sveltekit + Google firebase. The most important parts of t
 
 functions/
 
-Source folder for the google cloud functions, operating as the back end logic Most of the solution related logic is in droneLogger.js scheduler.js answers the question how to get a task like this running on cloud funtionns
+Source folder for the google cloud functions, operating as the back end logic Most of the solution related logic is in droneLogger.js where as scheduler.js answers the question how to get a task like this running on cloud functions
 
-src/droneWatcher
+src/droneWatcher/
 
-Frontend of the solution in svelte DroneWatcher.svelte for the whole component, Violations.svelte for a table of the reguired adata for the assigment and LiveView for (arguably) cool areal snapshot of the area
+Frontend of the solution is in DroneWatcher.svelte for the whole component, Violations.svelte for a table of the reguired data for the assigment and LiveView.svelte for (arguably) cool areal snapshot
 
 ## Kinks and quirks
-The scheduler turns of after 30 minutes without and update from client.
+The scheduler turns off after 30 minutes without an update from client.
 
 Bc of the way scheduler is only run every minute, it takes up to a minute to start working again.
 
-The cloudfunctions have somethign called "ramp-up-time" before they are given the full performance (I suppose dedicated threat or something) for which is why the program might studder or lag for the first ten minutes of being active or so.
+The cloudfunctions have somethign called "ramp-up-time" before they are given the full performance (I suppose dedicated threat or something) for which is why the program might studder or lag for the first ten minutes or so of being active.
 
-Also the assigment URL returns 429 every now or then (I would assume its bc someone else is doing the assigment aswell) an update might be skipped.
+Also the assigment URL returns 429 every now or then (I would assume its bc someone else is doing the assigment aswell) when an update might be skipped.
