@@ -28,3 +28,4 @@ exports.differenseInMinutes = (t1, t2) => {
   const diffMs = Math.abs( t1.valueOf() - t2.valueOf() )
   return diffMs / 1000 / 60
 }
+
